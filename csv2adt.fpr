@@ -1,0 +1,47 @@
+program csv2adt;
+
+{$mode delphi}
+
+uses csvdocument;
+
+procedure OutputCsvFileAsAdt(Filename: WideString);
+const
+  US = chr(31);
+  RS = chr(30);
+var
+  Document: TCsvDocument;
+  Row, Column: Integer;
+  RecordWritten, UnitWritten: Boolean;
+begin
+  try
+    Document := TCsvDocument.Create;
+    Document.LoadFromFile(Filename);
+
+    RecordWritten := False;
+
+    for Row := 0 to Document.RowCount - 1 do begin
+      if RecordWritten = True then begin
+        Write(RS);
+      end;
+
+      UnitWritten := False;
+      for Column := 0 to Document.MaxColCount - 1 do begin
+        if UnitWritten = True then begin
+          Write(US);
+        end;
+        Write(Document.Cells[Column, Row]);
+        UnitWritten := True;
+        RecordWritten := True;
+      end;
+    end;
+
+  finally
+    Document.Free;
+  end;
+end;
+
+begin
+  if ParamCount >= 1 then begin
+    OutputCsvFileAsAdt(ParamStr(1));
+  end;
+end.
